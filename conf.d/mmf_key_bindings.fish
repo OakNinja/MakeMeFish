@@ -1,5 +1,5 @@
-bind \cm 'mmf'
+bind \cj 'mmf'
 
 if bind -M insert >/dev/null 2>/dev/null
-    bind -M insert \cm 'mmf'
+    bind -M insert \cmj 'mmf'
 end
