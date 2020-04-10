@@ -9,7 +9,7 @@ MakeMe fish fzf integration
 
 ## Install 
 ### Note: This will also install jethrokuan/fzf if not already installed
-`fisher add oakninja/MakeMeFish`
+`fisher add OakNinja/MakeMeFish`
 
 
 ## Usage
