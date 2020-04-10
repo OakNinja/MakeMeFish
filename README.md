@@ -2,10 +2,10 @@
 MakeMe fish fzf integration
 
 ## Prerequisities
-* Fish shell
-* fzf https://github.com/junegunn/fzf#installation
-* fisher https://github.com/jorgebucaran/fisher
-* MakeMe
+* [Fish shell](https://fishshell.com/)
+* [fzf](https://github.com/junegunn/fzf#installation)
+* [fisher](https://github.com/jorgebucaran/fisher)
+* [MakeMe](https://github.com/OakNinja/MakeMe)
 
 ## Install 
 ### Note: This will also install jethrokuan/fzf if not already installed
@@ -13,7 +13,7 @@ MakeMe fish fzf integration
 
 
 ## Usage
-type `mmf` or press `ctrl+m`
+type `mmf`
 
 
 ## Todo:
