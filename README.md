@@ -1,4 +1,5 @@
 # MakeMeFish
+[![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)
 MakeMeFish simplifies the usage of Makefiles by providing quick navigation and searching.
 
 If you don't use fish, MakeMeFish is available as a python package. See [MakeMe](https://github.com/OakNinja/MakeMe/)
