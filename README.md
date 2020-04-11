@@ -1,8 +1,11 @@
 # MakeMeFish
+## Easing the usage of makefiles
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)
+
 MakeMeFish simplifies the usage of Makefiles by providing quick navigation and searching.
 
-If you don't use fish, MakeMeFish is available as a python package. See [MakeMe](https://github.com/OakNinja/MakeMe/)
+If you don't use fish, MakeMeFish is available as a python package. 
+See [MakeMe](https://github.com/OakNinja/MakeMe/)
 
 ## Prerequisities
 * Fish shell
@@ -10,7 +13,8 @@ If you don't use fish, MakeMeFish is available as a python package. See [MakeMe]
 * fisher https://github.com/jorgebucaran/fisher
 
 ## Install 
-### Note: This will also install jethrokuan/fzf if not already installed
+**Note: This will also install jethrokuan/fzf if not already installed**
+
 `fisher add oakninja/MakeMeFish`
 
 ## Usage
