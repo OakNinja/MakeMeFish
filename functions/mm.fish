@@ -25,7 +25,7 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     # Get maketargets
     function __get_targets
         set makefile (__find_makefile)
-        if test ! $status -eq 0  # No makefile found, exit
+        if test $status -eq 1  # No makefile found, exit
             return 1 
         end
         set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
@@ -44,14 +44,14 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     # Run MakeMeFish
     function run
         set targets __get_targets  # Get all targets
-        if test ! $status -eq 0  # No targets found, exit
-            return 0 
+        set makefile (__find_makefile)
+        if test $status -eq 1  # No makefile found, exit
+            return 1 
         end
         $targets | eval (__fzfcmd) | read -lz result  # Get targets, pipe them to fzf, put the chosen command in a variable called result
         set result (string trim -- $result)  # Trim newlines and whitespace from the command
         and commandline -- "make $result"  # Prepend the make keyword
         commandline -f repaint  # Repaint command line
-
     end
 
     run  # Execute
