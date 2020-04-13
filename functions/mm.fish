@@ -1,20 +1,36 @@
-function mm -a 'filename' --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
+function mm --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
+   
 
-    # If no filename is provided, Makefile is used
-    function __get_filename -a filename  
-        if not set -q filename[1]
-            set makefile_name 'Makefile' 
-        else
-            set makefile_name $filename
+    function __find_makefile  # Looks for a makefile in the priority order defined by GNU Make
+
+        set makefile
+        if test -f 'GNUmakefile'
+            set makefile 'GNUmakefile'
+        else if test -f 'makefile'
+            set makefile 'makefile'
+        else if test -f 'Makefile'
+            set makefile 'Makefile'
         end
-        echo $makefile_name
+        if test -z $makefile  # Check that makefile variable has a value
+            echo "No makefile found" 1>&2 # writes to stdout
+            return 1
+        end
+        if test ! -s $makefile  #
+            echo "No targets found in $makefile" 1>&2 # writes to stdout
+            return 1
+        end
+        echo $makefile
     end
 
-    # Get maketargets from provided filename
-    function __get_targets -a filename
+    # Get maketargets
+    function __get_targets
+        set makefile (__find_makefile)
+        if test ! $status -eq 0  # No makefile found, exit
+            return 1 
+        end
         set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
         set targets  # This is where we keep our targets
-        for row in (cat $filename)  # Loop over all rows in the Makefile
+        for row in (cat $makefile)  # Loop over all rows in the Makefile
             set target (string match -r $target_pattern $row)  # Do a regex match for the pattern on the row
             if test $status -eq 0  # This row contained a target
                 set targets $targets "$target[2]"  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
@@ -26,17 +42,17 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
     end
 
     # Run MakeMeFish
-    function run -a filename
-        if test -f $filename
-            set targets __get_targets $filename # Get all targets
-            $targets | eval (__fzfcmd) | read -lz result  # Get targets, pip them to fzf, put the chosen command in a variable called result
-            set result (string trim -- $result)  # Trim newlines and whitespace from the command
-            and commandline -- "make $result"  # Append the make keyword
-            commandline -f repaint  # Repaint command line
-        else 
-            echo "No file named $filename found."
+    function run
+        set targets __get_targets  # Get all targets
+        if test ! $status -eq 0  # No targets found, exit
+            return 0 
         end
+        $targets | eval (__fzfcmd) | read -lz result  # Get targets, pipe them to fzf, put the chosen command in a variable called result
+        set result (string trim -- $result)  # Trim newlines and whitespace from the command
+        and commandline -- "make $result"  # Prepend the make keyword
+        commandline -f repaint  # Repaint command line
+
     end
 
-    run (__get_filename $filename) # Execute
+    run  # Execute
 end

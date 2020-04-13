@@ -19,6 +19,4 @@ See [MakeMe](https://github.com/OakNinja/MakeMe/)
 
 ## Usage
 type `mm`, if there is a Makefile in the current working directory, all targets will be listed. Start typing to filter targets.
-If you want to specify a Makefile name:
-type `mm <filename>`
 
