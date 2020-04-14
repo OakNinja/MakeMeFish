@@ -15,7 +15,7 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
             echo "No makefile found" 1>&2 # writes to stdout
             return 1
         end
-        if test ! -s $makefile  #
+        if test ! -s $makefile
             echo "No targets found in $makefile" 1>&2 # writes to stdout
             return 1
         end
@@ -23,17 +23,13 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     end
 
     # Get maketargets
-    function __get_targets
-        set makefile (__find_makefile)
-        if test $status -eq 1  # No makefile found, exit
-            return 1 
-        end
+    function __get_targets -a 'makefile'
         set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
         set targets  # This is where we keep our targets
         for row in (cat $makefile)  # Loop over all rows in the Makefile
-            set target (string match -r $target_pattern $row)  # Do a regex match for the pattern on the row
+            set target (string match -r $target_pattern -- $row)  # Do a regex match for the pattern on the row       
             if test $status -eq 0  # This row contained a target
-                set targets $targets "$target[2]"  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
+                set targets $targets (string trim -- $target[2])  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
             end
         end
         for target in $targets  # Loop over all targets and echo them on separate rows
@@ -43,12 +39,11 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
 
     # Run MakeMeFish
     function run
-        set targets __get_targets  # Get all targets
         set makefile (__find_makefile)
         if test $status -eq 1  # No makefile found, exit
-            return 1 
+            return 0 
         end
-        $targets | eval (__fzfcmd) | read -lz result  # Get targets, pipe them to fzf, put the chosen command in a variable called result
+        __get_targets $makefile | eval (__fzfcmd) | read -lz result  # Get targets, pipe them to fzf, put the chosen command in a variable called result
         set result (string trim -- $result)  # Trim newlines and whitespace from the command
         and commandline -- "make $result"  # Prepend the make keyword
         commandline -f repaint  # Repaint command line
