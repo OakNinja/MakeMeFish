@@ -1,4 +1,4 @@
-function mmd -a 'filename' --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
+function mm -a 'filename' --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
 
     function __get_makefile_name -a 'filename'
         if test -n "$filename"
