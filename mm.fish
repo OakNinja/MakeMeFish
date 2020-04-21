@@ -26,6 +26,17 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
         echo $targets
     end
 
+    # Copied from https://github.com/jethrokuan/fzf/blob/master/functions/__fzfcmd.fish
+    function __fzf_command
+        set -q FZF_TMUX; or set FZF_TMUX 0
+        set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 40%
+        if [ $FZF_TMUX -eq 1 ]
+            echo "fzf-tmux -d$FZF_TMUX_HEIGHT"
+        else
+            echo "fzf"
+        end
+    end
+
     function run -a 'filename'
         set custom_filename $filename
         set filename (__get_makefile_name $filename)
@@ -39,7 +50,7 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
                 else
                     set make_command "make"
                 end
-                printf "%s\n" $targets | eval (__fzfcmd) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in a variable called result
+                printf "%s\n" $targets | eval (__fzf_command) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in a variable called result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make keyword
                 commandline -f repaint  # Repaint command line
