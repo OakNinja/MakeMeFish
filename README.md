@@ -10,7 +10,6 @@ See [MakeMe](https://github.com/OakNinja/MakeMe/)
 ## Prerequisities
 * Fish shell
 * fzf https://github.com/junegunn/fzf#installation
-* fisher https://github.com/jorgebucaran/fisher
 
 ## Install using fisher
 `fisher add oakninja/MakeMeFish`
