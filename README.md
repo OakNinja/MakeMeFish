@@ -21,8 +21,10 @@ See [MakeMe](https://github.com/OakNinja/MakeMe/)
 
 ## Install manually 
 Clone this repo `git clone https://github.com/OakNinja/MakeMeFish`
-and then copy `mm.fish` to `~/.config/fish/functions` or create a symlink
-`ln -s mm.fish ~/.config/fish/functions/mm.fish`
+
+and then copy `mm.fish` to `~/.config/fish/functions` 
+
+or create a symlink `ln -s mm.fish ~/.config/fish/functions/mm.fish`
 
 ## Usage
 type `mm`, if there is a Makefile in the current working directory, all targets will be listed. Start typing to filter targets.
