@@ -1,8 +1,13 @@
 # MakeMeFish
 ## Easing the usage of makefiles
-[![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mmf.gif)
+[![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
 
 MakeMeFish simplifies the usage of Makefiles by providing quick navigation and searching through make targets.
+
+## Features
+* Type ahead searching - just write a few characters to filter out the targets you are looking for
+* Preview - When selecting a target, an excerpt of the target will be shown in the makefile, with match highlighting
+* Snappy - fzf-ingly fast!
 
 If you don't use fish, MakeMeFish is available as a python package. 
 See [MakeMe](https://github.com/OakNinja/MakeMe/)

@@ -1,5 +1,5 @@
 function mm -a 'filename' --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
-
+    
     function __get_makefile_name -a 'filename'
         if test -n "$filename"
             set makefile_filenames $filename
@@ -13,7 +13,6 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
             end
         end
     end
-
     function __get_targets -a 'filename'
         set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
         set targets  # This is where we keep our targets
@@ -27,13 +26,13 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
     end
 
     # Copied from https://github.com/jethrokuan/fzf/blob/master/functions/__fzfcmd.fish
-    function __fzf_command
+    function __fzf_command -a 'filename'
         set -q FZF_TMUX; or set FZF_TMUX 0
-        set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 40%
+        set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
         if [ $FZF_TMUX -eq 1 ]
-            echo "fzf-tmux -d$FZF_TMUX_HEIGHT"
+            echo "fzf-tmux -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
         else
-            echo "fzf"
+            echo "fzf --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename'"
         end
     end
 
@@ -50,7 +49,7 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
                 else
                     set make_command "make"
                 end
-                printf "%s\n" $targets | eval (__fzf_command) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in a variable called result
+                printf "%s\n" $targets | eval (__fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in a variable called result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make keyword
                 commandline -f repaint  # Repaint command line
