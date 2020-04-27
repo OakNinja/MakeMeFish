@@ -13,7 +13,7 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
             end
         end
     end
-    function __get_targets -a 'filename'
+    function __get_targets -a 'filename'  # Only used when MAKE_ME_FISH_PARSER is set to custom (or something other than fish_default
         set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
         set targets  # This is where we keep our targets
         for row in (cat $filename)  # Loop over all rows in the Makefile
@@ -42,7 +42,12 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
         if test -z "$filename"
             echo 'No makefile found in the current working directory'
         else
-            set targets (string split " " -- (__get_targets $filename))
+            set -q MAKE_ME_FISH_PARSER; or set MAKE_ME_FISH_PARSER "fish_default"
+            if string match -q "fish_default" $MAKE_ME_FISH_PARSER  # Using built in parsing of makefile
+                set targets (__fish_print_make_targets "" $filename)
+            else
+                set targets (string split " " -- (__get_targets $filename))  # Manual parsing of targets, more robust, but only prints pure targets, not functions. set MAKE_ME_FISH_PARSER to "custom" to use
+            end
             if test -n "$targets[1]"
                 if test -n "$custom_filename"
                     set make_command "make -f $filename"
@@ -58,5 +63,6 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
             end
         end
     end
+
     run $filename
 end
