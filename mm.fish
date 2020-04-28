@@ -13,19 +13,41 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
             end
         end
     end
-    function __get_targets -a 'filename'  # Only used when MAKE_ME_FISH_PARSER is set to custom (or something other than fish_default
-        set target_pattern '^([a-zA-Z0-9][^\$#\/\t=]+?):[^$#\/\t=]*$'  # This is the pattern for matching make targets
-        set targets  # This is where we keep our targets
-        for row in (cat $filename)  # Loop over all rows in the Makefile
-            set target (string match -r -- $target_pattern $row)  # Do a regex match for the pattern on the row
-            if test $status -eq 0  # This row contained a target
-                set targets $targets (string trim -- $target[2])  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
+
+    # Based on: 
+    # https://github.com/fish-shell/fish-shell/blob/8e418f5205106b11f83fa1956076a9b20c56f0f9/share/completions/make.fish 
+    # and 
+    # https://stackoverflow.com/a/26339924
+    function __parse_makefile -a 'filename'
+        # Since we filter based on localized text, we need to ensure the
+        # text will be using the correct locale.
+        set -lx LC_ALL C
+
+        set makeflags -f $filename
+        
+        if make --version 2>/dev/null | string match -q 'GNU*'
+            make $makeflags -pRrq : 2>/dev/null |
+            awk -F: '/^# Files/,/^# Finished Make data base/ {
+                    if ($1 == "# Not a target") skip = 1;
+                    if ($1 !~ "^[#.\t]") { if (!skip) print $1; skip=0 }
+                }' 2>/dev/null
+        else
+            # BSD make
+            make $makeflags -d g1 -rn >/dev/null 2>| awk -F, '/^#\*\*\* Input graph:/,/^$/ {if ($1 !~ "^#... ") {gsub(/# /,"",$1); print $1}}' 2>/dev/null
+        end
+    end
+
+    function __get_targets -a 'filename'
+        set targets 
+        set parsed_makefile (__parse_makefile $filename) 
+        for row in $parsed_makefile  # Loop over all rows in the Makefile
+            if test -n "$row"
+                set targets $targets (string trim -- $row)  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
             end
         end
         echo $targets
     end
 
-    # Copied from https://github.com/jethrokuan/fzf/blob/master/functions/__fzfcmd.fish
     function __fzf_command -a 'filename'
         set -q FZF_TMUX; or set FZF_TMUX 0
         set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
@@ -42,21 +64,16 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
         if test -z "$filename"
             echo 'No makefile found in the current working directory'
         else
-            set -q MAKE_ME_FISH_PARSER; or set MAKE_ME_FISH_PARSER "fish_default"
-            if string match -q "fish_default" $MAKE_ME_FISH_PARSER  # Using built in parsing of makefile
-                set targets (__fish_print_make_targets "" $filename)
-            else
-                set targets (string split " " -- (__get_targets $filename))  # Manual parsing of targets, more robust, but only prints pure targets, not functions. set MAKE_ME_FISH_PARSER to "custom" to use
-            end
-            if test -n "$targets[1]"
+            set targets (string split " " -- (__get_targets $filename))
+            if test -n "$targets"
                 if test -n "$custom_filename"
                     set make_command "make -f $filename"
                 else
                     set make_command "make"
                 end
-                printf "%s\n" $targets | eval (__fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in a variable called result
+                printf "%s\n" $targets | eval (__fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
-                and commandline -- "$make_command $result"  # Prepend the make keyword
+                and commandline -- "$make_command $result"  # Prepend the make command
                 commandline -f repaint  # Repaint command line
             else
                 echo "No targets found in $filename"
