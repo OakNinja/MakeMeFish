@@ -38,23 +38,48 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
     end
 
     function __mm_get_targets -a 'filename'
-        set targets 
-        set parsed_makefile (__mm_parse_makefile $filename) 
+        set static_targets
+        set generated_targets 
+        set parsed_makefile (__mm_parse_makefile $filename | sort -f) 
         for row in $parsed_makefile  # Loop over all rows in the Makefile
             if test -n "$row"
-                set targets $targets (string trim -- $row)  # Append the target to targets list, indexes is 1-based, so group 2 is [2]
+                set found_in_file (grep "$row:" $filename)
+                if test -n "$found_in_file"
+                    if test -n "$static_targets"
+                        set static_targets "$static_targets\0$row"  # Append the target to targets list
+                    else
+                        set static_targets "$row"
+                    end
+                else
+                    if test -n "$generated_targets"
+                        set generated_targets "$generated_targets\0$row"  # Append the target to targets list
+                    else
+                        set generated_targets "$row"
+                    end
+                end
             end
         end
-        echo $targets
+        set output
+        if test -n "$static_targets"
+            set output "$static_targets"
+        end
+        if test -n "$generated_targets"
+            if test -n "$output"
+                set output "$output\0$generated_targets"
+            else
+                set output "$generated_targets"
+            end
+        end
+        echo "$output"
     end
 
     function __mm_fzf_command -a 'filename'
         set -q FZF_TMUX; or set FZF_TMUX 0
         set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
         if [ $FZF_TMUX -eq 1 ]
-            echo "fzf-tmux -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
+            echo "fzf-tmux --read0 -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
         else
-            echo "fzf --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename'"
+            echo "fzf --read0 --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
         end
     end
 
@@ -71,7 +96,7 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
                 else
                     set make_command "make"
                 end
-                printf "%s\n" $targets | eval (__mm_fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
+                printf $targets | eval (__mm_fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make command
                 commandline -f repaint  # Repaint command line
