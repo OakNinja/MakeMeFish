@@ -19,6 +19,12 @@ See [MakeMe](https://github.com/OakNinja/MakeMe/)
 ## Install using fisher
 `fisher add oakninja/MakeMeFish`
 
+or
+
+`fisher add oakninja/MakeMeFish@next-release` 
+
+to get the latest version
+
 ## Install manually 
 Clone this repo `git clone https://github.com/OakNinja/MakeMeFish`
 
