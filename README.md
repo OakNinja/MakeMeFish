@@ -28,7 +28,11 @@ or
 
 `fisher add oakninja/MakeMeFish@next-release`
 
-to get the latest version
+to get the latest version.
+
+it's also possible to get the previous version by running
+
+`fisher add oakninja/MakeMeFish@previous-version`
 
 ## Install manually
 
