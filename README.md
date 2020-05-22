@@ -8,9 +8,9 @@ MakeMeFish simplifies the usage of Makefiles by providing quick navigation and s
 
 ## Features
 
-- Type ahead searching - just write a few characters to filter out the targets you are looking for
-- Preview - When selecting a target, an excerpt of the target will be shown in the makefile, with match highlighting
-- Snappy - fzf-ingly fast!
+- *Type ahead searching* - just write a few characters to filter out the targets you are looking for
+- *Preview* - When selecting a target, an excerpt of the target will be shown in the makefile, with match highlighting
+- *Snappy* - fzf-ingly fast!
 
 If you don't use fish, MakeMeFish is available as a python package.
 See [MakeMe](https://github.com/OakNinja/MakeMe/)
