@@ -55,7 +55,7 @@ _Parameters:_
 
 ## Examples
 
-`mm build` will start `MakeMeFish` with an initial query which will filter targets containing the substring `build`.
+`mm build` will start `MakeMeFish` with an initial query which will filter for targets containing the substring `build`.
 Similarly, `mm foo bar` will filter on targets containing both `foo` and `bar`
 
 ---
