@@ -1,5 +1,22 @@
-function mm -a 'filename' --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
+function mm --description "MakeMeFish - List all Make targets in the Makefile of the current directory"
     
+    set current_pos 1 
+    while test (count $argv) -ge $current_pos
+        if test $argv[$current_pos] = "-f" 
+            set current_pos (math "$current_pos+1") # skip the next
+            set filename $argv[$current_pos]
+        else if test $argv[$current_pos] = "-i" 
+            set interactive 1
+        else
+            if set -q initial_query
+                set initial_query $initial_query $argv[$current_pos]
+            else
+                set initial_query $argv[$current_pos]
+            end
+        end
+        set current_pos (math "$current_pos+1")
+    end
+
     function __mm_get_makefile_name -a 'filename'
         if test -n "$filename"
             set makefile_filenames $filename
@@ -62,37 +79,58 @@ function mm -a 'filename' --description "MakeMeFish - List all Make targets in t
         string split " " $static_targets $file_targets $generated_targets
     end
 
-    function __mm_fzf_command -a 'filename'
+    function __mm_fzf_command -a 'filename' -a 'query'
+        if test -n "$query"
+            set opts "--query=$query"
+        end
         set -q FZF_TMUX; or set FZF_TMUX 0
         set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
         if [ $FZF_TMUX -eq 1 ]
-            echo "fzf-tmux --read0 -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
+            echo "fzf-tmux --read0 -d$FZF_TMUX_HEIGHT $opts --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
         else
-            echo "fzf --read0 --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
+            echo "fzf --read0 $opts --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
         end
     end
 
-    function __mm_run -a 'filename'
-        set custom_filename $filename
-        set filename (__mm_get_makefile_name $filename)
-        if test -z "$filename"
-            echo 'No makefile found in the current working directory'
+    function __fzf_interactive_command -a 'filename' -a 'make_command' -a 'query' 
+        set opts "--bind \"enter:execute:$make_command {}; echo; echo 'Done'; sleep 1\""
+        if test -n "$query"
+            set opts "$opts --query=$query"
+        end
+        set -q FZF_TMUX; or set FZF_TMUX 0
+        set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
+        if [ $FZF_TMUX -eq 1 ]
+            echo "fzf-tmux --read0 $opts -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
         else
-            set targets (__mm_get_targets $filename)
-            if test -n "$targets"
-                if test -n "$custom_filename"
-                    set make_command "make -f $filename"
-                else
-                    set make_command "make"
-                end
-                string join0 $targets | eval (__mm_fzf_command $filename) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
+            echo "fzf --read0 $opts --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
+        end
+    end
+
+    set custom_filename $filename
+    set filename (__mm_get_makefile_name $filename)
+    if test -z "$filename"
+        echo 'No makefile found in the current working directory'
+    else
+        set targets (__mm_get_targets $filename)
+        if test -n "$targets"
+            if test -n "$custom_filename"
+                set make_command "make -f $filename"
+            else
+                set make_command "make"
+            end
+            # Interactive?
+            if test -n "$interactive"; and test $interactive -eq 1   
+                string join0 $targets | eval (__fzf_interactive_command $filename $make_command $initial_query)
+            else
+                string join0 $targets | eval (__mm_fzf_command $filename $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make command
                 commandline -f repaint  # Repaint command line
-            else
-                echo "No targets found in $filename"
             end
+        else
+            echo "No targets found in $filename"
         end
     end
-    __mm_run $filename
 end
+
+
