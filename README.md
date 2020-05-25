@@ -36,11 +36,10 @@ it's also possible to get the previous version by running
 
 ## Install manually
 
-Clone this repo `git clone https://github.com/OakNinja/MakeMeFish`
+Download and copy `mm.fish` to `~/.config/fish/functions`
 
-and then copy `mm.fish` to `~/.config/fish/functions`
-
-or create a symlink `ln -s mm.fish ~/.config/fish/functions/mm.fish`
+or run
+`curl https://raw.githubusercontent.com/OakNinja/MakeMeFish/master/mm.fish?nocache --create-dirs -sLo ~/.config/fish/functions/mm.fish`
 
 ## Usage
 
