@@ -39,6 +39,7 @@ it's also possible to get the previous version by running
 Download and copy `mm.fish` to `~/.config/fish/functions`
 
 or run
+
 `curl https://raw.githubusercontent.com/OakNinja/MakeMeFish/master/mm.fish?nocache --create-dirs -sLo ~/.config/fish/functions/mm.fish`
 
 ## Usage
