@@ -5,8 +5,16 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         # Check if a help flag was passed to mm
         set help_flags -- -h --help
         if contains -- $argv[$current_pos] $help_flags
-            echo 'HELP (Print help)'
-            exit
+            echo ""
+            echo "    Usage:"
+            echo "      " (set_color green)"mm"(set_color normal) "will look for a Makefile in the order specified by GNU Make and list all targets in it."
+            echo "      " "To filter for a specific target, just start typing and targets will be filtered as you type."
+            echo "      " (set_color green)"mm <keyword>"(set_color normal) "will start MakeMeFish with an initial, editable query" (set_color green)"<keyword>"(set_color normal)
+            echo "      " (set_color green)"mm -i"(set_color normal) "will start MakeMeFish in interactive mode. When a target is run, you will return to the selection menu."
+            echo "      " (set_color green)"mm -f <filename>"(set_color normal) "to specify what Makefile to load."
+            echo "      " "All flags can be combined in any order."
+            echo ""
+            return 0
         else if test $argv[$current_pos] = "-f" 
             set current_pos (math "$current_pos+1") # skip the next
             set filename $argv[$current_pos]
@@ -41,8 +49,7 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     # and 
     # https://stackoverflow.com/a/26339924
     function __mm_parse_makefile -a 'filename'
-        # Since we filter based on localized text, we need to ensure the
-        # text will be using the correct locale.
+        # Ensure correct locale set
         set -lx LC_ALL C
 
         set makeflags -f $filename
@@ -50,9 +57,11 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         if make --version 2>/dev/null | string match -q 'GNU*'
             make $makeflags -pRrq : 2>/dev/null |
             awk -F: '/^# Files/,/^# Finished Make data base/ {
-                    if ($1 == "# Not a target") skip = 1;
-                    if ($1 !~ "^[#.\t]") { if (!skip) print $1; skip=0 }
-                }' 2>/dev/null
+                        if ($1 == "# Not a target") skip = 1;
+                        if ($1 !~ "^[#.\t]") { 
+                            if (!skip) print $1; skip=0 
+                        }
+                    }' 2>/dev/null
         else
             # BSD make
             make $makeflags -d g1 -rn >/dev/null 2>| awk -F, '/^#\*\*\* Input graph:/,/^$/ {if ($1 !~ "^#... ") {gsub(/# /,"",$1); print $1}}' 2>/dev/null
