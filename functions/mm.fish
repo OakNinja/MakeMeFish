@@ -2,7 +2,20 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     
     set current_pos 1 
     while test (count $argv) -ge $current_pos
-        if test $argv[$current_pos] = "-f" 
+        # Check if a help flag was passed to mm
+        set help_flags -- -h --help
+        if contains -- $argv[$current_pos] $help_flags
+            echo ""
+            echo "    Usage:"
+            echo "      " (set_color green)"mm"(set_color normal) "will look for a Makefile in the order specified by GNU Make and list all targets in it."
+            echo "      " "To filter for a specific target, just start typing and targets will be filtered as you type."
+            echo "      " (set_color green)"mm <keyword>"(set_color normal) "will start MakeMeFish with an initial, editable query" (set_color green)"<keyword>"(set_color normal)
+            echo "      " (set_color green)"mm -i"(set_color normal) "will start MakeMeFish in interactive mode. When a target is run, you will return to the selection menu."
+            echo "      " (set_color green)"mm -f <filename>"(set_color normal) "to specify what Makefile to load."
+            echo "      " "All flags can be combined in any order."
+            echo ""
+            return 0
+        else if test $argv[$current_pos] = "-f" 
             set current_pos (math "$current_pos+1") # skip the next
             set filename $argv[$current_pos]
         else if test $argv[$current_pos] = "-i" 
@@ -36,8 +49,7 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
     # and 
     # https://stackoverflow.com/a/26339924
     function __mm_parse_makefile -a 'filename'
-        # Since we filter based on localized text, we need to ensure the
-        # text will be using the correct locale.
+        # Ensure correct locale set
         set -lx LC_ALL C
 
         set makeflags -f $filename
@@ -45,9 +57,11 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         if make --version 2>/dev/null | string match -q 'GNU*'
             make $makeflags -pRrq : 2>/dev/null |
             awk -F: '/^# Files/,/^# Finished Make data base/ {
-                    if ($1 == "# Not a target") skip = 1;
-                    if ($1 !~ "^[#.\t]") { if (!skip) print $1; skip=0 }
-                }' 2>/dev/null
+                        if ($1 == "# Not a target") skip = 1;
+                        if ($1 !~ "^[#.\t]") { 
+                            if (!skip) print $1; skip=0 
+                        }
+                    }' 2>/dev/null
         else
             # BSD make
             make $makeflags -d g1 -rn >/dev/null 2>| awk -F, '/^#\*\*\* Input graph:/,/^$/ {if ($1 !~ "^#... ") {gsub(/# /,"",$1); print $1}}' 2>/dev/null
@@ -79,30 +93,30 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         string split " " $static_targets $file_targets $generated_targets
     end
 
-    function __mm_fzf_command -a 'filename' -a 'query'
-        if test -n "$query"
-            set opts "--query=$query"
+    function __mm_fzf_command -a 'filename' -a 'interactive' -a 'make_command' -a 'query'
+        if [ $interactive -eq 1 ]
+            set fzf_interactive "--bind \"enter:execute:$make_command {}; echo; echo 'Done'; sleep 1\""
         end
-        set -q FZF_TMUX; or set FZF_TMUX 0
-        set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
-        if [ $FZF_TMUX -eq 1 ]
-            echo "fzf-tmux --read0 -d$FZF_TMUX_HEIGHT $opts --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
-        else
-            echo "fzf --read0 $opts --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
-        end
-    end
 
-    function __fzf_interactive_command -a 'filename' -a 'make_command' -a 'query' 
-        set opts "--bind \"enter:execute:$make_command {}; echo; echo 'Done'; sleep 1\""
         if test -n "$query"
-            set opts "$opts --query=$query"
+            set fzf_query "--query=$query"
         end
+        set fzf_opts "--read0 
+                      $fzf_query 
+                      $fzf_interactive
+                      --height 60% 
+                      --layout=reverse 
+                      --border 
+                      --preview-window='right:60%' 
+                      --preview='grep 
+                      --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
+        
         set -q FZF_TMUX; or set FZF_TMUX 0
         set -q FZF_TMUX_HEIGHT; or set FZF_TMUX_HEIGHT 60%
         if [ $FZF_TMUX -eq 1 ]
-            echo "fzf-tmux --read0 $opts -d$FZF_TMUX_HEIGHT --layout=reverse --border --preview='grep -A 10 -B 1 \^{}: $filename'"
+            echo "fzf-tmux -d$FZF_TMUX_HEIGHT $fzf_opts"
         else
-            echo "fzf --read0 $opts --height 60% --layout=reverse --border --preview='grep --color=always -A 10 -B 1 \^{}: $filename; or echo -GENERATED TARGET-'"
+            echo "fzf $fzf_opts"
         end
     end
 
@@ -120,9 +134,9 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
             end
             # Interactive?
             if test -n "$interactive"; and test $interactive -eq 1   
-                string join0 $targets | eval (__fzf_interactive_command $filename $make_command $initial_query)
+                string join0 $targets | eval (__mm_fzf_command $filename 1 $make_command $initial_query)
             else
-                string join0 $targets | eval (__mm_fzf_command $filename $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
+                string join0 $targets | eval (__mm_fzf_command $filename 0 $make_command $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make command
                 commandline -f repaint  # Repaint command line
@@ -132,5 +146,3 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         end
     end
 end
-
-
