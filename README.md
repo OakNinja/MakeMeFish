@@ -1,9 +1,4 @@
-  __  __      _       __  __     ___ _    _    
- |  \/  |__ _| |_____|  \/  |___| __(_)__| |_  
- | |\/| / _` | / / -_) |\/| / -_) _|| (_-< ' \ 
- |_|  |_\__,_|_\_\___|_|  |_\___|_| |_/__/_||_|
-                                               
-
+# MakeMeFish
 ## Easing the usage of makefiles
 
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
