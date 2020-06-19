@@ -48,6 +48,8 @@ or run
 _Basic usage:_
 type `mm`, if there is a Makefile in the current working directory, all targets will be listed. Start typing to filter targets.
 
+type `mm -h` to print the help.
+
 _Parameters:_
 
 - `-f <filename>` to specify a makefile if you have several in the cwd, or if you have a non-standard name.
