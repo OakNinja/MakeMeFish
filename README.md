@@ -1,5 +1,4 @@
-[![Logo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png)
-
+<img src="https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png" width="348" title="MakeMeFish Logo">
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
 
 MakeMeFish simplifies the usage of Makefiles by providing quick navigation and searching through make targets.
