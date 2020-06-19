@@ -45,13 +45,12 @@ or run
 
 ## Usage
 
-_Basic usage:_
+_Basic usage:_ 
 type `mm`, if there is a Makefile in the current working directory, all targets will be listed. Start typing to filter targets.
-
-type `mm -h` to print the help.
 
 _Parameters:_
 
+- `-h` or `--help` to print the help.
 - `-f <filename>` to specify a makefile if you have several in the cwd, or if you have a non-standard name.
 - `-i` to start MakeMefish in interactive mode. In interactive mode, the selected target will be executed and you will then be returned to the selection prompt. Please note that executed commands won't be added to your command history.
 - `<foo>` eg. add an arbitrary keyword to start MakeMeFish with a pre-populated query (editable at runtime)
