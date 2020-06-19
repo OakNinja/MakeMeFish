@@ -19,7 +19,7 @@ Don't use fish? Get in touch if you want MakeMe support in your shell.
 
 ## Install using omf
 
-`omf install makeme`
+`omf install MakeMe`
 
 ## Install using fisher
 
