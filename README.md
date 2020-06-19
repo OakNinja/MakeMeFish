@@ -1,5 +1,4 @@
-# MakeMeFish
-## Easing the usage of makefiles
+[![Logo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png)
 
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
 
@@ -11,13 +10,16 @@ MakeMeFish simplifies the usage of Makefiles by providing quick navigation and s
 - **Preview** - When selecting a target, an excerpt of the target will be shown in the makefile, with match highlighting
 - **Snappy** - fzf-ingly fast!
 
-If you don't use fish, MakeMeFish is available as a python package.
-See [MakeMe](https://github.com/OakNinja/MakeMe/)
-
 ## Prerequisities
 
-- Fish shell
+- Fish shell 3+
 - fzf https://github.com/junegunn/fzf#installation
+
+Don't use fish? Get in touch if you want MakeMe support in your shell.
+
+## Install using omf
+
+`omf install makeme`
 
 ## Install using fisher
 
