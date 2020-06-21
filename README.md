@@ -1,4 +1,4 @@
-<img src="https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png" width="348" title="MakeMeFish Logo">
+<img src="https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png" width="350" title="MakeMeFish Logo">
 
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
 
@@ -45,7 +45,7 @@ or run
 
 ## Usage
 
-_Basic usage:_ 
+_Basic usage:_
 type `mm`, if there is a Makefile in the current working directory, all targets will be listed. Start typing to filter targets.
 
 _Parameters:_
