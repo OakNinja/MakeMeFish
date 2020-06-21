@@ -54,8 +54,10 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
 
         set makeflags -f $filename
         
+        # first awk merges any line that ends with a backslash with the next line
         if make --version 2>/dev/null | string match -q 'GNU*'
             make $makeflags -pRrq : 2>/dev/null |
+            awk '{if (sub(/\\\$/,"")) printf "%s", $0; else print $0}' |
             awk -F: '/^# Files/,/^# Finished Make data base/ {
                         if ($1 == "# Not a target") skip = 1;
                         if ($1 !~ "^[#.\t]") { 
