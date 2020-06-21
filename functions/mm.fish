@@ -134,9 +134,9 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
             end
             # Interactive?
             if test -n "$interactive"; and test $interactive -eq 1   
-                string join0 $targets | eval (__mm_fzf_command $filename 1 $make_command $initial_query)
+                string join0 -- $targets | eval (__mm_fzf_command $filename 1 $make_command $initial_query)
             else
-                string join0 $targets | eval (__mm_fzf_command $filename 0 $make_command $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
+                string join0 -- $targets | eval (__mm_fzf_command $filename 0 $make_command $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
                 set result (string trim -- $result)  # Trim newlines and whitespace from the command
                 and commandline -- "$make_command $result"  # Prepend the make command
                 commandline -f repaint  # Repaint command line
