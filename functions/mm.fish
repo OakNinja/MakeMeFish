@@ -122,29 +122,32 @@ function mm --description "MakeMeFish - List all Make targets in the Makefile of
         end
     end
 
-    set custom_filename $filename
-    set filename (__mm_get_makefile_name $filename)
-    if test -z "$filename"
-        echo 'No makefile found in the current working directory'
-    else
-        set targets (__mm_get_targets $filename)
-        if test -n "$targets"
-            if test -n "$custom_filename"
-                set make_command "make -f $filename"
-            else
-                set make_command "make"
-            end
-            # Interactive?
-            if test -n "$interactive"; and test $interactive -eq 1   
-                string join0 -- $targets | eval (__mm_fzf_command $filename 1 $make_command $initial_query)
-            else
-                string join0 -- $targets | eval (__mm_fzf_command $filename 0 $make_command $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
-                set result (string trim -- $result)  # Trim newlines and whitespace from the command
-                and commandline -- "$make_command $result"  # Prepend the make command
-                commandline -f repaint  # Repaint command line
-            end
+    if __mm_dependencies
+        set custom_filename $filename
+        set filename (__mm_get_makefile_name $filename)
+        if test -z "$filename"
+            echo 'No makefile found in the current working directory'
         else
-            echo "No targets found in $filename"
+            set targets (__mm_get_targets $filename)
+            if test -n "$targets"
+                if test -n "$custom_filename"
+                    set make_command "make -f $filename"
+                else
+                    set make_command "make"
+                end
+                # Interactive?
+                if test -n "$interactive"; and test $interactive -eq 1
+                    string join0 -- $targets | eval (__mm_fzf_command $filename 1 $make_command $initial_query)
+                else
+                    string join0 -- $targets | eval (__mm_fzf_command $filename 0 $make_command $initial_query) | read -lz result  # print targets as a list, pipe them to fzf, put the chosen command in $result
+                    set result (string trim -- $result)  # Trim newlines and whitespace from the command
+                    and commandline -- "$make_command $result"  # Prepend the make command
+                    commandline -f repaint  # Repaint command line
+                end
+            else
+                echo "No targets found in $filename"
+            end
         end
     end
+
 end
