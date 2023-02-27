@@ -23,17 +23,17 @@ Don't use fish? Get in touch if you want MakeMe support in your shell.
 
 ## Install using fisher
 
-`fisher add oakninja/MakeMeFish`
+`fisher install oakninja/MakeMeFish`
 
 or
 
-`fisher add oakninja/MakeMeFish@next-release`
+`fisher install oakninja/MakeMeFish@next-release`
 
 to get the latest version.
 
 it's also possible to get the previous version by running
 
-`fisher add oakninja/MakeMeFish@previous-version`
+`fisher install oakninja/MakeMeFish@previous-version`
 
 ## Install manually
 
