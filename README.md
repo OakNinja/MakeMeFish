@@ -1,3 +1,7 @@
+> [!NOTE]
+> While `MakeMeFish` works as good as ever, there is now a new cross-platform version called [MakeMe](https://github.com/OakNinja/MakeMe).
+> It works with Zsh and Bash in addition to Fish, has zero dependencies, and can be easily installed via Homebrew.
+
 <img src="https://github.com/OakNinja/MakeMeFish/raw/master/docs/logo.png" width="350" title="MakeMeFish Logo">
 
 [![Demo](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)](https://github.com/OakNinja/MakeMeFish/raw/master/docs/mm.gif)
